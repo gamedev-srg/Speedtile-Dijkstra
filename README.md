@@ -10,5 +10,8 @@ and points the charecter to that direction.
 
 please go and play our game on Itch.io !
 
+### The files I changed:
+* [Djikstra](https://github.com/gamedev-srg/Speedtile-Dijkstra/blob/master/Assets/Scripts/0-bfs/BFS.cs) Despite the name of the file, we implemented several interfaces and allowed the algorithm to work on a weighted graph,including a complete implmentation Priority queues, and more. 
+* [Target Mover](https://github.com/gamedev-srg/Speedtile-Dijkstra/blob/master/Assets/Scripts/2-player/TargetMover.cs) Added different movment speed for different tiles
 
 https://g-r-s.itch.io/speed-tile-dijkastra

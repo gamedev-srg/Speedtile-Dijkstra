@@ -21,6 +21,7 @@ public class TargetMover: MonoBehaviour {
 
     [Tooltip("The target position in grid coordinates")]
     [SerializeField] Vector3Int targetInGrid;
+    private Dictionary<string,float> tile_name;
 
     protected bool atTarget;  // This property is set to "true" whenever the object has already found the target.
 
@@ -40,9 +41,35 @@ public class TargetMover: MonoBehaviour {
     private float timeBetweenSteps;
 
     protected virtual void Start() {
-        tilemapGraph = new TilemapGraph(tilemap, allowedTiles.Get());
+        tile_name = new Dictionary<string, float>();
+        TileBase[] temp_tileBases = allowedTiles.Get();
+        tilemapGraph = new TilemapGraph(tilemap, temp_tileBases);
         timeBetweenSteps = 1 / speed;
+        // at the start of the game add all allowed tile to a list so we can set the speed of each of them.
+        // this part of the code will be used often in dijkastra algorith,. these speed values are what sets the defenition for each tile
+        // in the allowed tiles.
+        foreach(TileBase t in temp_tileBases){
+                switch(t.name){
+                case "bushes":
+                    speed = 2f;
+                    tile_name.Add(t.name,speed);
+                    break;
+                case "grass":
+                    speed = 2.5f;
+                    tile_name.Add(t.name,speed);
+                    break;
+                case "hills":
+                    speed = 1.8f;
+                    tile_name.Add(t.name,speed);
+                    break;
+                case "swamp":
+                    speed = 1.2f;
+                    tile_name.Add(t.name,speed);
+                    break;
+            }
+        }
         StartCoroutine(MoveTowardsTheTarget());
+
     }
 
     IEnumerator MoveTowardsTheTarget() {
@@ -51,18 +78,28 @@ public class TargetMover: MonoBehaviour {
             if (enabled && !atTarget)
                 MakeOneStepTowardsTheTarget();
         }
+        
     }
 
     private void MakeOneStepTowardsTheTarget() {
         Vector3Int startNode = tilemap.WorldToCell(transform.position);
         Vector3Int endNode = targetInGrid;
-        List<Vector3Int> shortestPath = BFS.GetPath(tilemapGraph, startNode, endNode, maxIterations);
+        List<Vector3Int> shortestPath = BFS.GetPath(tilemapGraph, startNode, endNode,tilemap,tile_name,maxIterations);
         Debug.Log("shortestPath = " + string.Join(" , ",shortestPath));
+        // here we added a way to reconfigure the wait time so each tile speed is reflected by the time the player "waits" to move across.
         if (shortestPath.Count >= 2) {
             Vector3Int nextNode = shortestPath[1];
+            TileBase tileOnNewPosition = TileOnPosition(nextNode);
+            timeBetweenSteps = 1 / tile_name[tileOnNewPosition.name];
             transform.position = tilemap.GetCellCenterWorld(nextNode);
         } else {
             atTarget = true;
         }
+
+        
+    }
+    private TileBase TileOnPosition(Vector3 worldPosition) {
+        Vector3Int cellPosition = tilemap.WorldToCell(worldPosition);
+        return tilemap.GetTile(cellPosition);
     }
 }

@@ -1,5 +1,8 @@
 # This is an implentation of the Dijkastra algoriithm and speed tile.
 
+
+*BUG FIXED - player now finds the shortest path (instead of longest ;) )
+
 to play the game just point and click the screen !
 please note that the deep ocean and the mountains are not walkable so dont try them.
 

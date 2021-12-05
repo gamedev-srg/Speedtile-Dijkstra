@@ -150,12 +150,12 @@ public class BFS {
         */
         public myNode Popmin(){
             myNode minnode = new myNode();
-            float min = float.MaxValue;
+            float max = float.MaxValue;
             while(one.Count != 0){
                 myNode temp = one.Dequeue();
-                if(temp.getWeight() < min){
+                if(temp.getWeight() < max){
                     minnode = temp;
-                    min = temp.getWeight();
+                    max = temp.getWeight();
                 }
                 two.Enqueue(temp);
             }
@@ -190,7 +190,6 @@ public class BFS {
         HashSet<NodeType> visited = new HashSet<NodeType>();
         Dictionary<myNode, myNode> prev = new Dictionary<myNode, myNode>();
         myNode current = new myNode(convert_NodeType(startNode), 0);
-        myNode dst = new myNode(convert_NodeType(endNode), 0);
         pque.Enqueue(current);
         for (int i = 0; i < maxiterations; ++i) {
             if(pque.Count() == 0){ // we got to the end of the queue and didnt find a path, so we give up.
@@ -198,8 +197,9 @@ public class BFS {
             }else{
                 current = pque.Popmin(); // get the minimum weighted node
                 NodeType src = (NodeType)Convert.ChangeType(current ,typeof(NodeType)); // convert the src and end, src is used as current as well.
-                NodeType end = (NodeType)Convert.ChangeType(dst ,typeof(NodeType));
-                if( src.Equals(end)){// we found the destination node so we start to reconstruct the path (erels code.)
+                Vector3Int cur = convert_NodeType(src);
+                Vector3Int end = convert_NodeType(endNode);
+                if( cur == end ){// we found the destination node so we start to reconstruct the path (erels code.)
                     outputPath.Add(src);
                     while(prev.ContainsKey(current)){
                         current = prev[current];
@@ -215,6 +215,7 @@ public class BFS {
                         TileBase tilespeed = TileOnPosition(temp);
                         myNode neighNode = new myNode(temp , tname[tilespeed.name]); // sets the wieght of the next node as the actual size.
                         if( ! visited.Contains(neighbor)){
+                            visited.Add(neighbor);
                             neighNode = new myNode(temp , float.MaxValue);  // if the node is new, keep the wieght, else set the wieght as infinity to get the most effective one.
                         }
                         float tempDistance = current.getWeight() + tname[tilespeed.name]; // tempDistance represents the distance thus far.
@@ -222,7 +223,7 @@ public class BFS {
                             neighNode.setWeight(tempDistance);
                             pque.Enqueue(neighNode);
                             prev[neighNode] = current;
-                            visited.Add(neighbor);
+                            
                         }
                     }
                 }

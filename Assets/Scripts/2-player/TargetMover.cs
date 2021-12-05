@@ -50,20 +50,21 @@ public class TargetMover: MonoBehaviour {
         // in the allowed tiles.
         foreach(TileBase t in temp_tileBases){
                 switch(t.name){
+                    // BUG FIX-  lowest value = maximum speed
                 case "bushes":
-                    speed = 2f;
+                    speed = 1f;
                     tile_name.Add(t.name,speed);
                     break;
                 case "grass":
-                    speed = 2.5f;
+                    speed = 0.8f;
                     tile_name.Add(t.name,speed);
                     break;
                 case "hills":
-                    speed = 1.8f;
+                    speed = 1.23f;
                     tile_name.Add(t.name,speed);
                     break;
                 case "swamp":
-                    speed = 1.2f;
+                    speed = 1.5f;
                     tile_name.Add(t.name,speed);
                     break;
             }
@@ -87,10 +88,11 @@ public class TargetMover: MonoBehaviour {
         List<Vector3Int> shortestPath = BFS.GetPath(tilemapGraph, startNode, endNode,tilemap,tile_name,maxIterations);
         Debug.Log("shortestPath = " + string.Join(" , ",shortestPath));
         // here we added a way to reconfigure the wait time so each tile speed is reflected by the time the player "waits" to move across.
-        if (shortestPath.Count >= 2) {
+        if (shortestPath.Count >= 2 ) {
+            // BUG FIX - no dividing by 1 the time of walking.
             Vector3Int nextNode = shortestPath[1];
             TileBase tileOnNewPosition = TileOnPosition(nextNode);
-            timeBetweenSteps = 1 / tile_name[tileOnNewPosition.name];
+            timeBetweenSteps = tile_name[tileOnNewPosition.name];
             transform.position = tilemap.GetCellCenterWorld(nextNode);
         } else {
             atTarget = true;
